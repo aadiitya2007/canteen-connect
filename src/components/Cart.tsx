@@ -100,7 +100,7 @@ export default function Cart({ cart, onChange, onClose, onOrderPlaced, onOpenAut
               </div>
               <ul>
                 {couponOptions.map((option) => {
-                  const applied = coupon.trim() === option.code;
+                  const applied = coupon.trim().toUpperCase() === option.code;
                   return (
                     <li key={option.code}>
                       <div>
