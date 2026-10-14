@@ -84,6 +84,40 @@ export function addOrder(history: Order[], order: Order): Order[] {
   return newestFirst([...history, { ...order, items: order.items.map((line) => ({ ...line })) }]);
 }
 
+export function mergeOrders(...histories: Order[][]): Order[] {
+  const ordersById = new Map<string, Order>();
+
+  for (const history of histories) {
+    for (const order of history) {
+      ordersById.set(order.id, { ...order, items: order.items.map((line) => ({ ...line })) });
+    }
+  }
+
+  const merged = newestFirst([...ordersById.values()]);
+  const current = histories[0];
+  if (
+    current &&
+    merged.length === current.length &&
+    merged.every((order, index) => {
+      const existing = current[index];
+      return (
+        order.id === existing.id &&
+        order.total === existing.total &&
+        order.placedAt === existing.placedAt &&
+        order.status === existing.status &&
+        order.items.length === existing.items.length &&
+        order.items.every((line, itemIndex) => {
+          const existingLine = existing.items[itemIndex];
+          return line.id === existingLine.id && line.qty === existingLine.qty;
+        })
+      );
+    })
+  ) {
+    return current;
+  }
+  return merged;
+}
+
 export function orderToCart(order: Order): CartLine[] {
   return order.items.map((line) => ({ ...line }));
 }

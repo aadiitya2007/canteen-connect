@@ -5,7 +5,7 @@ import Orders from "./components/Orders";
 import AuthModal from "./components/AuthModal";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { addToCart, changeQty, itemCount, type CartLine } from "./lib/cart";
-import { addOrder, createOrder, orderToCart, parseCart, parseHistory, type Order } from "./lib/history";
+import { createOrder, mergeOrders, orderToCart, parseCart, parseHistory, type Order } from "./lib/history";
 import { CATEGORIES, filterMenu, MENU, sortMenu, type Category, type SortOrder } from "./lib/menu";
 import { saveOrderToDatabase, subscribeUserOrders } from "./lib/orders";
 
@@ -35,6 +35,16 @@ function CanteenApp() {
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
   }, [orders]);
 
+  useEffect(() => {
+    function syncOrders(event: StorageEvent) {
+      if (event.storageArea !== localStorage || event.key !== ORDERS_KEY) return;
+      setOrders((current) => mergeOrders(current, parseHistory(event.newValue)));
+    }
+
+    window.addEventListener("storage", syncOrders);
+    return () => window.removeEventListener("storage", syncOrders);
+  }, []);
+
   // Sync real-time orders from Firestore when user is logged in
   useEffect(() => {
     if (!user) return;
@@ -42,7 +52,7 @@ function CanteenApp() {
       user.uid,
       (remoteOrders) => {
         if (remoteOrders.length > 0) {
-          setOrders(remoteOrders);
+          setOrders((current) => mergeOrders(current, remoteOrders));
         }
       },
       (err) => {
@@ -65,7 +75,7 @@ function CanteenApp() {
     }
 
     const placedAt = new Date().toISOString();
-    let orderId = String(Date.now());
+    let orderId: string = crypto.randomUUID();
 
     try {
       // Step 5: Save order to database collection 'orders'
@@ -79,7 +89,7 @@ function CanteenApp() {
     }
 
     const order = createOrder(orderId, cart, total, placedAt, "received");
-    setOrders((history) => addOrder(history, order));
+    setOrders((history) => mergeOrders(history, parseHistory(localStorage.getItem(ORDERS_KEY)), [order]));
     setCart([]);
     return orderId;
   }
