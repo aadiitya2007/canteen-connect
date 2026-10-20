@@ -1,4 +1,5 @@
 import type { CartLine } from "./cart";
+import type { MenuItem } from "./menu";
 
 export interface Order {
   id: string;
@@ -118,6 +119,14 @@ export function mergeOrders(...histories: Order[][]): Order[] {
   return merged;
 }
 
-export function orderToCart(order: Order): CartLine[] {
-  return order.items.map((line) => ({ ...line }));
+export function orderToCart(order: Order, menu?: MenuItem[]): CartLine[] {
+  if (!menu) {
+    return order.items.map((line) => ({ ...line }));
+  }
+  return order.items
+    .filter((line) => {
+      const item = menu.find((menuItem) => menuItem.id === line.id);
+      return item ? item.available : false;
+    })
+    .map((line) => ({ ...line }));
 }

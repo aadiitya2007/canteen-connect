@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { addOrder, createOrder, mergeOrders, orderToCart, parseCart, parseHistory, type Order } from "./history";
+import { MENU } from "./menu";
 
 const older: Order = {
   id: "older",
@@ -78,5 +79,15 @@ describe("order history", () => {
       { id: 1, qty: 2 },
     ]);
     expect(parseCart("broken")).toEqual([]);
+  });
+
+  it("excludes sold-out items when converting an order to cart", () => {
+    // Item 1 is Masala Dosa (available: true)
+    // Item 10 is Chole Bhature (available: false)
+    const mixedOrder = createOrder("mixed-1", [{ id: 1, qty: 1 }, { id: 10, qty: 2 }], 240, "2026-10-01T12:00:00Z");
+    const reorderedCart = orderToCart(mixedOrder, MENU);
+
+    expect(reorderedCart).toEqual([{ id: 1, qty: 1 }]);
+    expect(reorderedCart.find((line) => line.id === 10)).toBeUndefined();
   });
 });
