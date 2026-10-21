@@ -106,7 +106,7 @@ function CanteenApp() {
   }
 
   function reorder(order: Order) {
-    setCart(orderToCart(order));
+    setCart(orderToCart(order, effectiveMenu));
     setView("menu");
     setCartOpen(true);
   }
