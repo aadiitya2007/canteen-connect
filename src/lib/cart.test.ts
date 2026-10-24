@@ -3,7 +3,7 @@ import { addToCart, changeQty, itemCount } from "./cart";
 
 describe("Cart Operations (src/lib/cart.ts)", () => {
   it("adds an item to an empty cart with qty 1", () => {
-    const initialCart = [];
+    const initialCart: Parameters<typeof addToCart>[0] = [];
     const updated = addToCart(initialCart, 1);
     expect(updated).toEqual([{ id: 1, qty: 1 }]);
   });
