@@ -81,8 +81,8 @@ To connect your own Firebase project for local development:
 
 6. **Staff Admin Dashboard & Kitchen Queue**:
    - Accounts registered under `VITE_ADMIN_EMAILS` have access to the dedicated Admin Panel via the top navigation bar.
-   - **Kitchen Live Queue**: Real-time incoming order tracking with status updates (`Pending` -> `Preparing` -> `Ready for Pickup` -> `Completed` -> `Cancelled`).
-   - **Menu Manager**: Add new food items, update existing prices and categories, toggle item availability, or delete items.
+   - **Kitchen Live Queue**: Real-time incoming order tracking with status updates (`received` -> `preparing` -> `ready` -> `completed` -> `cancelled`).
+   - **Menu Manager**: Toggle availability and in-stock / out-of-stock status for canteen menu items.
    - **Revenue & Analytics**: Total revenue overview, completed order metrics, and daily order history exportable to CSV.
 
 7. **Start the Application**:
@@ -94,8 +94,7 @@ To connect your own Firebase project for local development:
 
 - `src/lib/firebase.ts`: Firebase client initialization (Auth & Firestore)
 - `src/lib/orders.ts`: Firestore orders storage & real-time listener
-- `src/lib/auth-validation.ts`: College domain (@spit.ac.in) validation logic
-- `src/lib/admin.ts`: Staff role check and admin permissions (`isAdminEmail`)
+- `src/lib/auth-validation.ts`: College domain (@spit.ac.in) validation logic and staff admin check (`isAdminEmail`)
 - `src/context/AuthContext.tsx`: React Context for authentication state
 - `src/components/Login.tsx` & `src/components/Signup.tsx`: Authentication UI
 - `src/components/admin/`: Staff admin dashboard, Kitchen Queue, Menu Manager, and Revenue Analytics
